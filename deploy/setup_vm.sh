@@ -24,15 +24,16 @@ echo "API Key check passed."
 echo "Updating system..."
 sudo apt-get update && sudo apt-get upgrade -y
 
+echo "Installing Git and Playwright dependencies..."
+sudo apt-get install -y git
+sudo npx playwright install-deps
+
 echo "Installing Node.js and npm..."
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
-echo "Installing Playwright dependencies..."
-sudo npx playwright install-deps
-
 echo "Installing OpenClaw CLI..."
-sudo npm install -g @openclaw/cli
+sudo npm install -g openclaw@latest
 
 echo "Cloning ASO repository..."
 git clone $GITHUB_URL aso
