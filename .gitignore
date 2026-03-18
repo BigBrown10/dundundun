@@ -13,5 +13,5 @@ credentials.json
 .DS_Store
 Thumbs.db
 
-# Deployment scripts (if they contain placeholders)
-deploy/setup_vm.sh
+# Deployment scripts (Safe version)
+# deploy/setup_vm.sh
