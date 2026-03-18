@@ -1,5 +1,9 @@
+#!/bin/bash
+# launch_aso.sh - Native OpenClaw Activation for ASO
+
+echo "🚀 Initializing Autonomous Sales Orchestrator..."
+
 # 1. Force permissions and Token
-chmod +x "$0"
 TOKEN="aso_secure_token_2026"
 export OPENCLAW_GATEWAY_TOKEN="$TOKEN"
 
