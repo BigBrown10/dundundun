@@ -18,31 +18,49 @@ if [ -z "$API_KEY" ]; then
     exit 1
 fi
 
+GITHUB_URL="https://github.com/BigBrown10/dundundun"
 GEMINI_API_KEY=$API_KEY
-echo "API Key check passed."
+echo "Configuration verified."
+
+echo "Cleaning up old Node.js repositories..."
+sudo rm -f /etc/apt/sources.list.d/nodesource.list
+sudo apt-get update
 
 echo "Updating system..."
-sudo apt-get update && sudo apt-get upgrade -y
+sudo apt-get upgrade -y
 
-echo "Installing Git and Playwright dependencies..."
+echo "Installing Git..."
 sudo apt-get install -y git
-sudo npx playwright install-deps
 
 echo "Installing Node.js and npm (Version 22)..."
 curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
+# Verify Node version
+NODE_VER=$(node -v)
+echo "Installed Node version: $NODE_VER"
+
+echo "Installing Playwright dependencies..."
+sudo npx playwright install-deps
+
 echo "Installing OpenClaw CLI..."
 sudo npm install -g openclaw@latest
 
 echo "Cloning ASO repository..."
-# Cleanup old attempt if it exists
-rm -rf dundundun
-git clone "$GITHUB_URL"
-cd dundundun
+# Cleanup old attempts
+rm -rf aso dundundun
+git clone "$GITHUB_URL" aso
+cd aso
 
 echo "Setting up environment variables..."
-echo "export GEMINI_API_KEY=$GEMINI_API_KEY" >> ~/.bashrc
+# Prevent duplicates in .bashrc
+grep -q "GEMINI_API_KEY" ~/.bashrc || echo "export GEMINI_API_KEY=$GEMINI_API_KEY" >> ~/.bashrc
 export GEMINI_API_KEY=$GEMINI_API_KEY
 
-echo "Setup complete. Run 'openclaw team start openclaw-team.yaml' to begin."
+echo "------------------------------------------------"
+echo "Setup complete! Node version: $(node -v)"
+echo "Next steps:"
+echo "1. source ~/.bashrc"
+echo "2. cd aso"
+echo "3. openclaw team start openclaw-team.yaml"
+echo "------------------------------------------------"
