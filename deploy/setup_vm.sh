@@ -6,10 +6,15 @@
 # Use argument if provided, otherwise check env
 API_KEY=${1:-$GEMINI_API_KEY}
 
+if [ -z "$API_KEY" ]; then
+    echo -n "Please enter your Gemini API Key (input will be hidden): "
+    read -rs API_KEY
+    echo ""
+fi
+
 echo "Verifying API Key..."
 if [ -z "$API_KEY" ]; then
     echo "Error: Gemini API Key not found."
-    echo "Please run: ./setup_vm.sh AIzaSyB..."
     exit 1
 fi
 
