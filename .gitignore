@@ -1,0 +1,17 @@
+# .gitignore for ASO
+
+# Sensitive information
+.env
+*.key
+credentials.json
+
+# Tool-generated files
+/artifacts/
+/tmp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Deployment scripts (if they contain placeholders)
+deploy/setup_vm.sh
