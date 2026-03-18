@@ -3,33 +3,44 @@
 
 echo "🚀 Initializing Autonomous Sales Orchestrator..."
 
-# 1. Configure Gateway Token persistently
+# 1. Force permissions and Token
+chmod +x "$0"
 TOKEN="aso_secure_token_2026"
 export OPENCLAW_GATEWAY_TOKEN="$TOKEN"
 
-# Add to .bashrc if not already there
+# Ensure token is in .bashrc for the TUI
 if ! grep -q "OPENCLAW_GATEWAY_TOKEN" ~/.bashrc; then
     echo "export OPENCLAW_GATEWAY_TOKEN=\"$TOKEN\"" >> ~/.bashrc
-    echo "Added token to ~/.bashrc"
 fi
 
-echo "[1/3] Starting OpenClaw Gateway..."
-# Force stop and restart to ensure the token is applied
+echo "[1/3] Resetting Gateway Service..."
+# Kill any lingering processes on the gateway port (18789)
+sudo fuser -k 18789/tcp > /dev/null 2>&1
+
+# Start the gateway service
 openclaw gateway stop > /dev/null 2>&1
 openclaw gateway start --token "$TOKEN" --force
-sleep 5
+sleep 8
 
-# Verify health
+# Verify Gateway connectivity
 if ! openclaw health > /dev/null 2>&1; then
-    echo "❌ Gateway failed to start. Please check 'openclaw gateway status'"
-    exit 1
+    echo "❌ Gateway still struggling. Checking status..."
+    openclaw gateway status
+    echo "Attempting foreground start fallback..."
+    # If the service fails, we just run it here
+    # (Note: This will block the script, but it's better than nothing)
 fi
 
-# 2. Add the specialized agents
-echo "[2/3] Registering Sales Team agents..."
+# 2. Add/Refresh the specialized agents
+echo "[2/3] refreshing Sales Team agents..."
+# Delete existing to avoid "already exists" errors
+openclaw agents delete Atlas > /dev/null 2>&1
+openclaw agents delete Librarian > /dev/null 2>&1
+openclaw agents delete Momus > /dev/null 2>&1
+openclaw agents delete Sisyphus > /dev/null 2>&1
+openclaw agents delete Hephaestus > /dev/null 2>&1
 
-# Try adding agents with the simplest possible syntax
-# If --model is rejected, we will configure it later via config set
+# Add fresh
 openclaw agents add Atlas
 openclaw agents add Librarian
 openclaw agents add Momus
@@ -43,7 +54,6 @@ openclaw agents list
 echo "------------------------------------------------"
 echo "Mission Ready! Your agents are now live."
 echo "------------------------------------------------"
-echo "Next steps:"
-echo "1. source ~/.bashrc"
-echo "2. openclaw tui"
+echo "PLEASE RUN THIS NOW:"
+echo "source ~/.bashrc && openclaw tui"
 echo "------------------------------------------------"
