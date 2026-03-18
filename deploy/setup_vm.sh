@@ -28,16 +28,18 @@ echo "Installing Git and Playwright dependencies..."
 sudo apt-get install -y git
 sudo npx playwright install-deps
 
-echo "Installing Node.js and npm..."
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+echo "Installing Node.js and npm (Version 22)..."
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 echo "Installing OpenClaw CLI..."
 sudo npm install -g openclaw@latest
 
 echo "Cloning ASO repository..."
-git clone $GITHUB_URL aso
-cd aso
+# Cleanup old attempt if it exists
+rm -rf dundundun
+git clone "$GITHUB_URL"
+cd dundundun
 
 echo "Setting up environment variables..."
 echo "export GEMINI_API_KEY=$GEMINI_API_KEY" >> ~/.bashrc
