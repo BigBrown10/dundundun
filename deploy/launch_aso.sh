@@ -3,26 +3,26 @@
 
 echo "🚀 Initializing Autonomous Sales Orchestrator..."
 
-# 1. Start the Gateway in the background if not running
+# 1. Start the Gateway with a fixed token for the TUI
+export OPENCLAW_GATEWAY_TOKEN="aso_secure_token_2026"
+
 if ! openclaw health > /dev/null 2>&1; then
     echo "[1/3] Starting OpenClaw Gateway..."
-    openclaw gateway start
+    # Force stop any existing gateway to apply the new token
+    openclaw gateway stop > /dev/null 2>&1
+    openclaw gateway start --token "$OPENCLAW_GATEWAY_TOKEN"
     sleep 5
 fi
 
 # 2. Add the specialized agents
 echo "[2/3] Registering Sales Team agents..."
 
-# Atlas - Orchestrator
-openclaw agents add --name Atlas --role Orchestrator --model gemini-3.1-flash
-# Librarian - Researcher
-openclaw agents add --name Librarian --role Researcher --model gemini-3.1-flash
-# Momus - Analyst
-openclaw agents add --name Momus --role Analyst --model gemini-3.1-flash
-# Sisyphus - Closer
-openclaw agents add --name Sisyphus --role Closer --model gemini-3.1-flash
-# Hephaestus - Ops
-openclaw agents add --name Hephaestus --role "Sales Ops" --model gemini-1.5-flash
+# Positional name, then flags
+openclaw agents add Atlas --model gemini-3.1-flash
+openclaw agents add Librarian --model gemini-3.1-flash
+openclaw agents add Momus --model gemini-3.1-flash
+openclaw agents add Sisyphus --model gemini-3.1-flash
+openclaw agents add Hephaestus --model gemini-1.5-flash
 
 # 3. Final Verification
 echo "[3/3] Verifying team status..."
