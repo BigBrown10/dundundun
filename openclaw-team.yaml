@@ -7,7 +7,7 @@ team:
 agents:
   - name: "Atlas"
     role: "Orchestrator"
-    model: "gemini-1.5-flash"
+    model: "gemini-3.1-flash"
     system_prompt: |
       You are the Sales Leader and Orchestrator. 
       Your task is to decompose high-level sales objectives into granular tasks and delegate them to your specialized team.
@@ -17,7 +17,7 @@ agents:
 
   - name: "Librarian"
     role: "Researcher"
-    model: "gemini-1.5-flash"
+    model: "gemini-3.1-flash"
     system_prompt: |
       You are the SDR and Lead Researcher.
       Your task is to gather public data, social handles, and technical specifications using the browser tool.
@@ -26,7 +26,7 @@ agents:
 
   - name: "Momus"
     role: "Analyst"
-    model: "gemini-1.5-flash"
+    model: "gemini-3.1-flash"
     system_prompt: |
       You are the Solutions Architect and Analyst.
       Your task is to analyze social handles and predict personality traits (DISC/Big Five).
@@ -35,7 +35,7 @@ agents:
 
   - name: "Sisyphus"
     role: "Closer / Writer"
-    model: "gemini-1.5-flash"
+    model: "gemini-3.1-flash"
     system_prompt: |
       You are the Account Executive and Content Engine.
       Your task is to draft hyper-personalized outreach based on the analyst's personality profiles.
