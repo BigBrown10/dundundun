@@ -12,20 +12,24 @@ if ! grep -q "OPENCLAW_GATEWAY_TOKEN" ~/.bashrc; then
     echo "export OPENCLAW_GATEWAY_TOKEN=\"$TOKEN\"" >> ~/.bashrc
 fi
 
-echo "[1/3] Resetting Gateway Service..."
+echo "[1/3] Configuring and Resetting Gateway Service..."
 # Kill any lingering processes on port 18789
 sudo fuser -k 18789/tcp > /dev/null 2>&1
 
-# Stop and Force Start Gateway
+# Set the missing configuration that was causing the "Missing config" error
+openclaw config set gateway.mode local
+
+# Try to install the service and start it with the required flags
+sudo openclaw gateway install --token "$TOKEN" > /dev/null 2>&1
 openclaw gateway stop > /dev/null 2>&1
-openclaw gateway start --token "$TOKEN" --force
+openclaw gateway start --token "$TOKEN" --force --allow-unconfigured
 sleep 10
 
 # Verify Gateway Status
 if ! openclaw health > /dev/null 2>&1; then
-    echo "⚠️  Gateway background service failed. Starting in foreground fallback..."
-    # Launch in background with nohup to keep it alive
-    nohup openclaw gateway run --token "$TOKEN" > gateway.log 2>&1 &
+    echo "⚠️  Gateway service struggling. Forcing foreground fallback..."
+    # Launch in background with nohup + allow-unconfigured to bypass checks
+    nohup openclaw gateway run --token "$TOKEN" --allow-unconfigured > gateway.log 2>&1 &
     sleep 10
 fi
 
@@ -33,10 +37,12 @@ fi
 echo "[2/3] Adding Sales Team (handling prompts)..."
 
 # atlas, librarian, momus, sisyphus, hephaestus
-# We use echo "" to accept the default workspace path in the prompt
+# We use a robust HEREDOC to handle any interactive prompts
 for agent in atlas librarian momus sisyphus hephaestus; do
     echo "Adding $agent..."
-    echo "" | openclaw agents add $agent > /dev/null 2>&1
+    openclaw agents add "$agent" <<EOF
+
+EOF
 done
 
 # 3. Final Verification
