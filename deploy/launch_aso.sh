@@ -3,9 +3,16 @@
 
 echo "🚀 Initializing Autonomous Sales Orchestrator..."
 
-# 1. Force permissions and Token
+# 1. Force permissions, Token, and Gemini Mapping
 TOKEN="aso_secure_token_2026"
 export OPENCLAW_GATEWAY_TOKEN="$TOKEN"
+
+# Map Gemini Key and Gateway Mode
+openclaw config set providers.google.apiKey "$GEMINI_API_KEY"
+openclaw config set gateway.mode local
+
+# Set default model for the 'main' agent
+openclaw config set agents.main.model "google/gemini-3.1-flash"
 
 # Persistence
 if ! grep -q "OPENCLAW_GATEWAY_TOKEN" ~/.bashrc; then
@@ -33,16 +40,18 @@ if ! openclaw health > /dev/null 2>&1; then
     sleep 10
 fi
 
-# 2. Add Specialized Agents (Non-Interactive)
+# 2. Add and Configure Specialized Agents
 echo "[2/3] Adding Sales Team (handling prompts)..."
 
 # atlas, librarian, momus, sisyphus, hephaestus
 # We use a robust HEREDOC to handle any interactive prompts
 for agent in atlas librarian momus sisyphus hephaestus; do
-    echo "Adding $agent..."
+    echo "Configuring $agent..."
     openclaw agents add "$agent" <<EOF
 
 EOF
+    # Force Gemini 3.1 Flash for each agent
+    openclaw config set "agents.$agent.model" "google/gemini-3.1-flash"
 done
 
 # 3. Final Verification
